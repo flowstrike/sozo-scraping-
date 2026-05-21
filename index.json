@@ -1,0 +1,36 @@
+{
+  "name": "Custom Manga Providers",
+  "description": "Manga providers: MangaTown, Mangago, MangaBall.",
+  "sources": [
+    {
+      "id": "mangatown",
+      "name": "MangaTown",
+      "version": "1.0.0",
+      "type": "manga",
+      "lang": "en",
+      "file": "mangatown.js",
+      "logo": "https://www.mangatown.com/favicon.ico",
+      "nsfw": false
+    },
+    {
+      "id": "mangago",
+      "name": "Mangago",
+      "version": "1.0.0",
+      "type": "manga",
+      "lang": "en",
+      "file": "mangago.js",
+      "logo": "https://www.mangago.me/favicon.ico",
+      "nsfw": true
+    },
+    {
+      "id": "mangaball",
+      "name": "MangaBall",
+      "version": "1.0.0",
+      "type": "manga",
+      "lang": "en",
+      "file": "mangaball.js",
+      "logo": "https://mangaball.net/public/frontend/images/logo.svg",
+      "nsfw": true
+    }
+  ]
+}
