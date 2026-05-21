@@ -9,7 +9,7 @@ function getInfo() {
     baseUrl: SITE,
     logo: SITE + '/favicon.ico',
     type: 'manga',
-    version: '1.0.0'
+    version: '2.0.0'
   };
 }
 
@@ -203,15 +203,28 @@ function getPages(chapterUrl) {
     if (r.status !== 200) return [];
     var html = r.body || '';
     var out = [];
-    var re = /<img[^>]+src="(\/\/[^"]+)"[^>]+class="image"[^>]*>/g;
+    var seen = {};
+
+    var re = /<img[^>]+src="(\/\/[^"]+)"[^>]+class="image"[^>]*\/?>/g;
     var matches = _allMatches(html, re);
     if (matches.length === 0) {
-      re = /<img[^>]+class="image"[^>]+src="(\/\/[^"]+)"[^>]*>/g;
+      re = /<img[^>]+class="image"[^>]+src="(\/\/[^"]+)"[^>]*\/?>/g;
       matches = _allMatches(html, re);
     }
+    if (matches.length === 0) {
+      re = /<img[^>]+src="(\/\/zjcdn[^"]+)"[^>]*>/g;
+      matches = _allMatches(html, re);
+    }
+    if (matches.length === 0) {
+      re = /<img[^>]+src="(\/\/fmcdn[^"]+)"[^>]*>/g;
+      matches = _allMatches(html, re);
+    }
+
     for (var i = 0; i < matches.length; i++) {
       var src = matches[i][1];
       if (src.indexOf('//') === 0) src = 'https:' + src;
+      if (seen[src]) continue;
+      seen[src] = true;
       out.push({
         url: src,
         index: i,
