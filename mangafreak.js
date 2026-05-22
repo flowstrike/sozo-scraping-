@@ -59,12 +59,12 @@ function _browseHomepage() {
     if (r.status !== 200) return [];
     var html = r.body || '';
     var results = [];
-    var re = /datamanga="([^"]+)"[^>]*href="\/Manga\/([^"]+)"/g;
+    var re = /datamanga="[^"]*"[^>]*href="\/Manga\/([^"]+)"[^>]*>[\s\S]*?<img[^>]+alt="([^"]*)"[^>]*>/g;
     var m;
     var seen = {};
     while ((m = re.exec(html)) !== null) {
-      var title = _clean(m[1]);
-      var slug = m[2];
+      var slug = m[1];
+      var title = _clean(m[2]) || slug.replace(/_/g, ' ');
       if (seen[slug]) continue;
       seen[slug] = true;
       var cover = IMG + '/manga_images/' + slug.toLowerCase() + '.jpg';
@@ -84,15 +84,17 @@ function _browseHomepage() {
 
 function _parseSearchResults(html) {
   var results = [];
-  var re = /<a[^>]+href="\/Manga\/([^"]+)"[^>]*>[\s\S]*?<img[^>]+src="(https:\/\/images\.mangafreak\.me\/manga_images\/[^"]+)"[^>]*>/g;
-  var matches = _allMatches(html, re);
+  var re = /<a[^>]+href="\/Manga\/([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
   var seen = {};
-  for (var i = 0; i < matches.length; i++) {
-    var slug = matches[i][1];
-    var cover = matches[i][2];
+  var m;
+  while ((m = re.exec(html)) !== null) {
+    var slug = m[1];
+    var rawTitle = m[2];
     if (seen[slug]) continue;
     seen[slug] = true;
-    var title = slug.replace(/_/g, ' ');
+    var title = _clean(rawTitle);
+    if (!title) title = slug.replace(/_/g, ' ');
+    var cover = IMG + '/manga_images/' + slug.toLowerCase() + '.jpg';
     results.push({
       id: slug,
       title: title,

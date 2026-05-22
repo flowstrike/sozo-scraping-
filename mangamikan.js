@@ -157,7 +157,8 @@ function getPages(chapterUrl) {
     for (var i = 0; i < matches.length; i++) {
       out.push({
         url: SITE + _decodeEntities(matches[i][1]),
-        index: i
+        index: i,
+        headers: { 'Referer': chapterUrl }
       });
     }
     console.log('mangamikan pages count: ' + out.length);
