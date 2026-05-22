@@ -1,6 +1,6 @@
 {
   "name": "Custom Manga Providers",
-  "description": "Manga providers for Sozo Read: MangaTown, Mangakatana.",
+  "description": "Manga providers for Sozo Read: MangaTown, MangaDex.",
   "sources": [
     {
       "id": "mangatown",
@@ -13,13 +13,13 @@
       "nsfw": false
     },
     {
-      "id": "mangakatana",
-      "name": "Mangakatana",
+      "id": "mangadex",
+      "name": "MangaDex",
       "version": "1.0.0",
       "type": "manga",
       "lang": "en",
-      "file": "mangakatana.js",
-      "logo": "https://mangakatana.com/static/img/logo.png",
+      "file": "mangadex.js",
+      "logo": "https://mangadex.org/img/brand/mangadex-logo.svg",
       "nsfw": false
     }
   ]
