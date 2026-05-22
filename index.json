@@ -1,6 +1,6 @@
 {
   "name": "Custom Manga Providers",
-  "description": "Manga providers: MangaTown, MangaBall, Mangago.",
+  "description": "Manga providers for Sozo Read: MangaTown, MangaPill.",
   "sources": [
     {
       "id": "mangatown",
@@ -13,25 +13,14 @@
       "nsfw": false
     },
     {
-      "id": "mangaball",
-      "name": "MangaBall",
-      "version": "2.0.0",
-      "type": "manga",
-      "lang": "en",
-      "file": "mangaball.js",
-      "logo": "https://mangaball.net/public/frontend/images/logo.svg",
-      "nsfw": true
-    },
-    {
-      "id": "mangago",
-      "name": "Mangago",
+      "id": "mangapill",
+      "name": "MangaPill",
       "version": "1.0.0",
       "type": "manga",
       "lang": "en",
-      "file": "mangago.js",
-      "logo": "https://www.mangago.me/favicon.ico",
-      "nsfw": true,
-      "note": "Cloudflare-protected - may not work in Sozo Read runtime"
+      "file": "mangapill.js",
+      "logo": "https://mangapill.com/static/favicon/favicon.ico",
+      "nsfw": false
     }
   ]
 }

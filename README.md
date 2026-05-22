@@ -24,7 +24,7 @@ https://raw.githubusercontent.com/flowstrike/sozo-scraping-/main/index.json
 ```json
 {
   "name": "Custom Manga Providers",
-  "description": "Manga providers: MangaTown, Mangago, MangaBall.",
+  "description": "Manga providers: MangaTown, MangaPill.",
   "sources": [
     {
       "id": "mangatown",
@@ -121,9 +121,8 @@ async function getPages(chapterUrl) {
 
 | File            | Site                  | Type   | Notes                                                  |
 |-----------------|-----------------------|--------|--------------------------------------------------------|
-| `mangatown.js`  | mangatown.com         | manga  | Server-rendered HTML, direct image URLs. Fully working. |
-| `mangago.js`    | mangago.me            | manga  | HTML scraping + embedded AES-128-CBC decryption for encrypted image URLs. |
-| `mangaball.js`  | mangaball.net         | manga  | POST JSON API with CSRF tokens. Cloudflare may affect runtime. |
+| `mangatown.js`  | mangatown.com         | manga  | Server-rendered HTML. Images require Referer header. |
+| `mangapill.js`  | mangapill.com         | manga  | Server-rendered HTML. Images require Referer header. |
 
 ## Hosting your own repo
 
