@@ -39,23 +39,35 @@ function _normalizeStatus(s) {
 
 function search(query, page, opts) {
   var q = (query || '').trim();
-  if (!q) q = 'one piece';
+  if (!q) {
+    return _browseHomepage();
+  }
   var url = SITE + '/Find/' + encodeURIComponent(q);
   console.log('mangafreak search url: ' + url);
   return fetch(url).then(function(r) {
     console.log('mangafreak search status: ' + r.status);
     if (r.status !== 200) return [];
     var html = r.body || '';
+    return _parseSearchResults(html);
+  });
+}
+
+function _browseHomepage() {
+  var url = SITE + '/';
+  console.log('mangafreak browse homepage: ' + url);
+  return fetch(url).then(function(r) {
+    if (r.status !== 200) return [];
+    var html = r.body || '';
     var results = [];
-    var re = /<a[^>]+href="\/Manga\/([^"]+)"[^>]*>[\s\S]*?<img[^>]+src="(https:\/\/images\.mangafreak\.me\/manga_images\/[^"]+)"[^>]*>/g;
-    var matches = _allMatches(html, re);
+    var re = /datamanga="([^"]+)"[^>]*href="\/Manga\/([^"]+)"/g;
+    var m;
     var seen = {};
-    for (var i = 0; i < matches.length; i++) {
-      var slug = matches[i][1];
-      var cover = matches[i][2];
+    while ((m = re.exec(html)) !== null) {
+      var title = _clean(m[1]);
+      var slug = m[2];
       if (seen[slug]) continue;
       seen[slug] = true;
-      var title = slug.replace(/_/g, ' ');
+      var cover = IMG + '/manga_images/' + slug.toLowerCase() + '.jpg';
       results.push({
         id: slug,
         title: title,
@@ -65,9 +77,33 @@ function search(query, page, opts) {
         type: 'manga'
       });
     }
-    console.log('mangafreak search count: ' + results.length);
+    console.log('mangafreak browse count: ' + results.length);
     return results;
   });
+}
+
+function _parseSearchResults(html) {
+  var results = [];
+  var re = /<a[^>]+href="\/Manga\/([^"]+)"[^>]*>[\s\S]*?<img[^>]+src="(https:\/\/images\.mangafreak\.me\/manga_images\/[^"]+)"[^>]*>/g;
+  var matches = _allMatches(html, re);
+  var seen = {};
+  for (var i = 0; i < matches.length; i++) {
+    var slug = matches[i][1];
+    var cover = matches[i][2];
+    if (seen[slug]) continue;
+    seen[slug] = true;
+    var title = slug.replace(/_/g, ' ');
+    results.push({
+      id: slug,
+      title: title,
+      url: SITE + '/Manga/' + slug,
+      cover: cover,
+      sourceId: SOURCE_ID,
+      type: 'manga'
+    });
+  }
+  console.log('mangafreak search count: ' + results.length);
+  return results;
 }
 
 function getDetail(url) {
