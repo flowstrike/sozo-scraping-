@@ -1,6 +1,6 @@
 {
   "name": "Custom Manga Providers",
-  "description": "Manga providers for Sozo Read: MangaTown, Mangakakalot.",
+  "description": "Manga providers for Sozo Read: MangaTown, Mangakatana.",
   "sources": [
     {
       "id": "mangatown",
@@ -13,13 +13,13 @@
       "nsfw": false
     },
     {
-      "id": "mangakakalot",
-      "name": "Mangakakalot",
+      "id": "mangakatana",
+      "name": "Mangakatana",
       "version": "1.0.0",
       "type": "manga",
       "lang": "en",
-      "file": "mangakakalot.js",
-      "logo": "https://mangakakalot.fun/logo.png",
+      "file": "mangakatana.js",
+      "logo": "https://mangakatana.com/static/img/logo.png",
       "nsfw": false
     }
   ]

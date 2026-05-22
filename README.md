@@ -24,7 +24,7 @@ https://raw.githubusercontent.com/flowstrike/sozo-scraping-/main/index.json
 ```json
 {
   "name": "Custom Manga Providers",
-  "description": "Manga providers: MangaTown, Mangakakalot.",
+  "description": "Manga providers: MangaTown, Mangakatana.",
   "sources": [
     {
       "id": "mangatown",
@@ -122,7 +122,7 @@ async function getPages(chapterUrl) {
 | File              | Site                  | Type   | Notes                                                  |
 |-------------------|-----------------------|--------|--------------------------------------------------------|
 | `mangatown.js`    | mangatown.com         | manga  | Server-rendered HTML. Images require Referer header. |
-| `mangakakalot.js` | mangakakalot.fun      | manga  | Server-rendered HTML. Official sozoread-providers code. |
+| `mangakatana.js`  | mangakatana.com       | manga  | Server-rendered HTML. Official sozoread-providers code. |
 
 ## Hosting your own repo
 
