@@ -1,6 +1,6 @@
 {
   "name": "Custom Manga Providers",
-  "description": "Manga providers for Sozo Read: MangaFreak, MangaMikan, MangaTown.",
+  "description": "Manga provider for Sozo Read: MangaFreak.",
   "sources": [
     {
       "id": "mangafreak",
@@ -10,26 +10,6 @@
       "lang": "en",
       "file": "mangafreak.js",
       "logo": "https://www.mangafreak.me/favicon.ico",
-      "nsfw": false
-    },
-    {
-      "id": "mangamikan",
-      "name": "MangaMikan",
-      "version": "1.0.0",
-      "type": "manga",
-      "lang": "en",
-      "file": "mangamikan.js",
-      "logo": "https://mangamikan.com/assets/img/favicon.png",
-      "nsfw": false
-    },
-    {
-      "id": "mangatown",
-      "name": "MangaTown",
-      "version": "2.0.0",
-      "type": "manga",
-      "lang": "en",
-      "file": "mangatown.js",
-      "logo": "https://www.mangatown.com/favicon.ico",
       "nsfw": false
     }
   ]
