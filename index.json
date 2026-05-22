@@ -1,6 +1,6 @@
 {
   "name": "Custom Manga Providers",
-  "description": "Manga provider for Sozo Read: MangaFreak.",
+  "description": "Manga providers for Sozo Read: MangaFreak, E-Hentai.",
   "sources": [
     {
       "id": "mangafreak",
@@ -11,6 +11,16 @@
       "file": "mangafreak.js",
       "logo": "https://www.mangafreak.me/favicon.ico",
       "nsfw": false
+    },
+    {
+      "id": "ehentai",
+      "name": "E-Hentai",
+      "version": "1.0.0",
+      "type": "manga",
+      "lang": "en",
+      "file": "ehentai.js",
+      "logo": "https://e-hentai.org/favicon.ico",
+      "nsfw": true
     }
   ]
 }

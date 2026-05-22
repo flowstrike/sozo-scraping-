@@ -24,7 +24,7 @@ https://raw.githubusercontent.com/flowstrike/sozo-scraping-/main/index.json
 ```json
 {
   "name": "Custom Manga Providers",
-  "description": "Manga providers: MangaFreak.",
+  "description": "Manga providers: MangaFreak, E-Hentai.",
   "sources": [
     {
       "id": "mangatown",
@@ -122,6 +122,7 @@ async function getPages(chapterUrl) {
 | File            | Site                  | Type   | Notes                                                  |
 |-----------------|-----------------------|--------|--------------------------------------------------------|
 | `mangafreak.js` | mangafreak.me         | manga  | Server-rendered HTML. Images load without Referer. |
+| `ehentai.js`    | e-hentai.org          | manga  | Server HTML. Each image fetched individually (capped at 50). NSFW. |
 
 ## Hosting your own repo
 
