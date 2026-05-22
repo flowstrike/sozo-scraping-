@@ -94,18 +94,24 @@ function getDetail(url) {
       if (g && genres.indexOf(g) === -1) genres.push(g);
     }
 
-    var chapters = [{
-      id: '1',
-      title: title || 'Gallery',
-      number: 1,
-      url: url,
-      date: ''
-    }];
+    var chapters = [];
+    var numChapters = Math.ceil(pageCount / 40) || 1;
+    for (var ci = 0; ci < numChapters; ci++) {
+      var chUrl = url + (ci > 0 ? '?p=' + ci : '');
+      var chTitle = numChapters === 1 ? (title || 'Gallery') : ('Part ' + (ci + 1));
+      chapters.push({
+        id: '' + (ci + 1),
+        title: chTitle,
+        number: ci + 1,
+        url: chUrl,
+        date: ''
+      });
+    }
 
     var idM = url.match(/\/g\/(\d+)\//);
     var id = idM ? idM[1] : url;
 
-    console.log('ehentai detail: title=' + title + ' pages=' + pageCount);
+    console.log('ehentai detail: title=' + title + ' pages=' + pageCount + ' chapters=' + numChapters);
     return {
       id: id,
       sourceId: SOURCE_ID,
@@ -118,8 +124,7 @@ function getDetail(url) {
       description: description,
       genres: genres,
       type: 'manga',
-      chapters: chapters,
-      pageCount: pageCount
+      chapters: chapters
     };
   });
 }
@@ -128,44 +133,41 @@ function getChapters(url) {
   return getDetail(url).then(function(d) { return d.chapters || []; });
 }
 
-function getPages(galleryUrl) {
-  console.log('ehentai pages url: ' + galleryUrl);
-  return fetch(galleryUrl).then(function(r) {
+function _extractPageLinks(html) {
+  var links = [];
+  var re = /href="(https:\/\/e-hentai\.org\/s\/[^"]+)"/g;
+  var m;
+  while ((m = re.exec(html)) !== null) {
+    if (links.indexOf(m[1]) === -1) links.push(m[1]);
+  }
+  return links;
+}
+
+function getPages(chapterUrl) {
+  console.log('ehentai pages url: ' + chapterUrl);
+  return fetch(chapterUrl).then(function(r) {
     if (r.status !== 200) return [];
     var html = r.body || '';
-    var pageLinks = [];
-    var re = /href="(https:\/\/e-hentai\.org\/s\/[^"]+)"/g;
-    var seen = {};
-    var m;
-    while ((m = re.exec(html)) !== null) {
-      if (!seen[m[1]]) {
-        seen[m[1]] = true;
-        pageLinks.push(m[1]);
-      }
-    }
+    var pageLinks = _extractPageLinks(html);
     console.log('ehentai found ' + pageLinks.length + ' page links, fetching images...');
 
-    var limit = Math.min(pageLinks.length, 50);
-    var promises = [];
-    for (var i = 0; i < limit; i++) {
-      promises.push((function(link, idx) {
-        return fetch(link).then(function(pr) {
-          var phtml = pr.body || '';
-          var imgM = phtml.match(/id="img"[^>]*src="([^"]+)"/);
-          return {
-            url: imgM ? imgM[1] : '',
-            index: idx,
-            headers: { Referer: SITE + '/' }
-          };
-        }).catch(function() {
-          return { url: '', index: idx };
-        });
-      })(pageLinks[i], i));
-    }
+    var promises = pageLinks.map(function(link, idx) {
+      return fetch(link).then(function(pr) {
+        var phtml = pr.body || '';
+        var imgM = phtml.match(/id="img"[^>]*src="([^"]+)"/);
+        return {
+          url: imgM ? imgM[1] : '',
+          index: idx,
+          headers: { Referer: SITE + '/' }
+        };
+      }).catch(function() {
+        return { url: '', index: idx };
+      });
+    });
 
     return Promise.all(promises).then(function(pages) {
       var valid = pages.filter(function(p) { return p.url.length > 0; });
-      console.log('ehentai pages count: ' + valid.length + ' (capped at ' + limit + ')');
+      console.log('ehentai pages count: ' + valid.length);
       return valid;
     });
   });
