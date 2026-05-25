@@ -108,10 +108,10 @@ function getDetail(url) {
     }
 
     var chapters = [];
-    var chRe = /class="comics-chapters__item[^"]*"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
+    var chRe = /href="([^"]+)"[^>]*class="comics-chapters__item[^"]*"[^>]*>([\s\S]*?)<\/a>/g;
     var cm;
     while ((cm = chRe.exec(html)) !== null) {
-      var chUrl = cm[1];
+      var chUrl = cm[1].replace(/&amp;/g, '&');
       var chInner = cm[2];
       var chTitleM = chInner.match(/<span[^>]*>([\s\S]*?)<\/span>/);
       var chTitle = chTitleM ? _clean(chTitleM[1]) : '';
