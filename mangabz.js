@@ -27,9 +27,10 @@ function _baseConv(n, base) {
 }
 
 function _unpackPacked(packedStr) {
-  var m = packedStr.match(/\('([^']*)',(\d+),(\d+),'([^']*)'/);
+  var re = /\('((?:[^'\\]|\\.)*)',(\d+),(\d+),'((?:[^'\\]|\\.)*)'/;
+  var m = packedStr.match(re);
   if (!m) return '';
-  var p = m[1];
+  var p = m[1].replace(/\\'/g, "'");
   var a = parseInt(m[2], 10);
   var c = parseInt(m[3], 10);
   var k = m[4].split('|');
@@ -177,9 +178,25 @@ function getChapters(url) {
 }
 
 function _extractJsVar(html, varName) {
-  var re = new RegExp('var\\s+' + varName + '\\s*=\\s*["\']?([^"\'\\s;]+)');
-  var m = html.match(re);
+  var m;
+  m = html.match(new RegExp('var\\s+' + varName + '\\s*=\\s*"([^"]*)"'));
+  if (m) return m[1];
+  m = html.match(new RegExp("var\\s+" + varName + "\\s*=\\s*'([^']*)'"));
+  if (m) return m[1];
+  m = html.match(new RegExp('var\\s+' + varName + '\\s*=\\s*([^\\s;]+)'));
   return m ? m[1] : '';
+}
+
+function _parseCookies(headers) {
+  var sc = headers && (headers['set-cookie'] || headers['Set-Cookie'] || '');
+  if (!sc) return '';
+  var cookies = [];
+  var parts = Array.isArray(sc) ? sc : [sc];
+  for (var i = 0; i < parts.length; i++) {
+    var cv = (parts[i] || '').split(';')[0].trim();
+    if (cv && cv.indexOf('=') > 0) cookies.push(cv);
+  }
+  return cookies.join('; ');
 }
 
 function getPages(chapterUrl) {
@@ -187,6 +204,7 @@ function getPages(chapterUrl) {
   return fetch(chapterUrl).then(function(r) {
     if (r.status !== 200) return [];
     var html = r.body || '';
+    var cookieHeader = _parseCookies(r.headers);
 
     var cid = _extractJsVar(html, 'MANGABZ_CID');
     var mid = _extractJsVar(html, 'MANGABZ_MID');
@@ -204,18 +222,26 @@ function getPages(chapterUrl) {
 
     function fetchPage(pageNum) {
       var apiUrl = SITE + '/chapterimage.ashx?cid=' + cid + '&page=' + pageNum + '&key=&_cid=' + cid + '&_mid=' + mid + '&_dt=' + encodeURIComponent(dt) + '&_sign=' + sign;
-      return fetch(apiUrl).then(function(ar) {
+      return fetch(apiUrl, { headers: { Cookie: cookieHeader, Referer: chapterUrl } }).then(function(ar) {
         if (ar.status !== 200) return;
         var body = ar.body || '';
-        var unpacked = _unpackPacked(body);
-        var urlRe = /https?:\/\/image\.mangabz\.com\/[^'"\s]+/g;
-        var um;
-        while ((um = urlRe.exec(unpacked)) !== null) {
-          if (!seen[um[0]]) {
-            seen[um[0]] = true;
-            pages.push({ url: um[0], index: pages.length, headers: { Referer: SITE + '/' } });
+        if (!body) return;
+        try {
+          eval(body);
+        } catch(e) {
+          var unpacked = _unpackPacked(body);
+          try { eval(unpacked); } catch(e2) {}
+        }
+        if (typeof d !== 'undefined' && Array.isArray(d)) {
+          for (var i = 0; i < d.length; i++) {
+            var url = d[i];
+            if (url && !seen[url]) {
+              seen[url] = true;
+              pages.push({ url: url, index: pages.length, headers: { Referer: SITE + '/' } });
+            }
           }
         }
+        d = undefined;
       }).catch(function() {});
     }
 

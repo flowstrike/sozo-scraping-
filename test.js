@@ -20,10 +20,19 @@ function nodeFetch(url, opts) {
   var headers = opts.headers || {};
   return fetch(url, { headers: headers }).then(function(r) {
     return r.text().then(function(body) {
+      var allHeaders = {};
+      r.headers.forEach(function(v, k) {
+        if (k === 'set-cookie') {
+          if (!allHeaders[k]) allHeaders[k] = [];
+          allHeaders[k].push(v);
+        } else {
+          allHeaders[k] = v;
+        }
+      });
       return {
         status: r.status,
         body: body,
-        headers: Object.fromEntries(r.headers.entries())
+        headers: allHeaders
       };
     });
   });
