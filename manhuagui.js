@@ -18,10 +18,10 @@ function _clean(s) {
 }
 
 function _baseConv(n, base) {
-  var chars = '0123456789abcdefghijklmnopqrstuvwxyz';
   var r = '';
   do {
-    r = chars.charAt(n % base) + r;
+    var d = n % base;
+    r = (d > 35 ? String.fromCharCode(d + 29) : d.toString(36)) + r;
     n = Math.floor(n / base);
   } while (n > 0);
   return r;
@@ -43,60 +43,78 @@ function _unpackPacked(packedStr) {
 }
 
 function _lzDecompress(input) {
+  if (!input) return '';
   var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-  var revIdx = {};
-  for (var i = 0; i < keyStr.length; i++) revIdx[keyStr.charAt(i)] = i;
-  var pos = 0, buf = 0, bufLen = 0;
-  function read(n) {
-    var r = 0, b = 0;
-    while (b < n) {
-      if (bufLen === 0) {
-        if (pos >= input.length) return -1;
-        buf = revIdx[input.charAt(pos++)] || 0;
-        bufLen = 6;
+  var resetValue = 32;
+  var data = { val: keyStr.indexOf(input.charAt(0)), position: resetValue, index: 1 };
+  function readBits(n) {
+    var bits = 0, maxpower = Math.pow(2, n), power = 1;
+    while (power !== maxpower) {
+      var resb = data.val & data.position;
+      data.position >>= 1;
+      if (data.position === 0) {
+        data.position = resetValue;
+        data.val = keyStr.indexOf(input.charAt(data.index++));
       }
-      r |= (buf & 1) << b;
-      buf >>= 1;
-      bufLen--;
-      b++;
+      bits |= (resb > 0 ? 1 : 0) * power;
+      power <<= 1;
     }
-    return r;
+    return bits;
   }
-  var numBits = 8;
-  var c = read(numBits);
-  if (c < 0) return '';
-  var w = String.fromCharCode(c);
-  var result = w;
-  var dict = {};
-  var size = 256;
-  var enlargeCounter = Math.pow(2, numBits);
+  var dictionary = [0, 1, 2];
+  var enlargeIn = 4;
+  var dictSize = 4;
+  var numBits = 3;
+  var w, entry, c;
+  var result = [];
+  var bits = readBits(2);
+  switch (bits) {
+    case 0: c = String.fromCharCode(readBits(8)); break;
+    case 1: c = String.fromCharCode(readBits(16)); break;
+    case 2: return '';
+  }
+  dictionary[3] = c;
+  w = c;
+  result.push(c);
   while (true) {
-    c = read(numBits);
-    if (c < 0) break;
-    var entry;
-    if (c === 0) {
-      c = read(8);
-      if (c < 0) break;
-      entry = String.fromCharCode(c);
-    } else if (c === 1) {
-      c = read(16);
-      if (c < 0) break;
-      entry = String.fromCharCode(c);
-    } else if (c === 2) {
-      break;
-    } else {
-      entry = dict[c];
-      if (!entry) break;
+    if (data.index > input.length) return result.join('');
+    bits = readBits(numBits);
+    c = bits;
+    switch (c) {
+      case 0:
+        dictionary[dictSize++] = String.fromCharCode(readBits(8));
+        c = dictSize - 1;
+        enlargeIn--;
+        break;
+      case 1:
+        dictionary[dictSize++] = String.fromCharCode(readBits(16));
+        c = dictSize - 1;
+        enlargeIn--;
+        break;
+      case 2:
+        return result.join('');
     }
-    result += entry;
-    dict[size++] = w + entry.charAt(0);
-    w = entry;
-    if (--enlargeCounter === 0) {
+    if (enlargeIn === 0) {
+      enlargeIn = Math.pow(2, numBits);
       numBits++;
-      enlargeCounter = Math.pow(2, numBits);
+    }
+    entry = dictionary[c];
+    if (!entry) {
+      if (c === dictSize) {
+        entry = w + w.charAt(0);
+      } else {
+        return result.join('');
+      }
+    }
+    result.push(entry);
+    dictionary[dictSize++] = w + entry.charAt(0);
+    enlargeIn--;
+    w = entry;
+    if (enlargeIn === 0) {
+      enlargeIn = Math.pow(2, numBits);
+      numBits++;
     }
   }
-  return result;
 }
 
 function _unpackPackedLz(packedStr) {
@@ -256,18 +274,21 @@ function getPages(chapterUrl) {
     var html = r.body || '';
 
     var unpacked = '';
-    var packedLzRe = /eval\(function\(p,a,c,k,e,d\)\{[\s\S]*?\}\('[^']*',\d+,\d+,'[^']*'\)\)/;
-    var packedLzM = html.match(packedLzRe);
-    if (packedLzM) {
-      unpacked = _unpackPackedLz(packedLzM[0]);
-    }
-
-    if (!unpacked) {
-      var packedRe = /eval\(function\(p,a,c,k,e,d\)\{[\s\S]*?\}\('[^']*',\d+,\d+,'[^']*'\)\)/;
-      var packedM = html.match(packedRe);
-      if (packedM) {
-        unpacked = _unpackPacked(packedM[0]);
+    var argsRe = /function\(p,a,c,k,e,d\)\{[\s\S]*?\}\('([^']*)',(\d+),(\d+),'([^']*)'/;
+    var argsM = html.match(argsRe);
+    if (argsM) {
+      var p = argsM[1];
+      var a = parseInt(argsM[2], 10);
+      var c = parseInt(argsM[3], 10);
+      var kRaw = argsM[4];
+      var kLz = _lzDecompress(kRaw);
+      var k = (kLz && kLz.indexOf('|') >= 0) ? kLz.split('|') : kRaw.split('|');
+      while (c--) {
+        if (k[c]) {
+          p = p.replace(new RegExp('\\b' + _baseConv(c, a) + '\\b', 'g'), k[c]);
+        }
       }
+      unpacked = p;
     }
 
     if (!unpacked) {
@@ -276,7 +297,7 @@ function getPages(chapterUrl) {
     }
 
     var files = [];
-    var filesM = unpacked.match(/files:\s*\[([\s\S]*?)\]/);
+    var filesM = unpacked.match(/"files"\s*:\s*\[([\s\S]*?)\]/);
     if (filesM) {
       var fRe = /"([^"]+)"/g;
       var fm;
@@ -286,13 +307,13 @@ function getPages(chapterUrl) {
     }
 
     var path = '';
-    var pathM = unpacked.match(/path:\s*"([^"]+)"/);
+    var pathM = unpacked.match(/"path"\s*:\s*"([^"]+)"/);
     if (pathM) path = pathM[1];
 
     var slE = '', slMstr = '';
-    var slM1 = unpacked.match(/sl:\s*\{[^}]*e:\s*(\d+)/);
+    var slM1 = unpacked.match(/"sl"\s*:\s*\{[^}]*"e"\s*:\s*(\d+)/);
     if (slM1) slE = slM1[1];
-    var slM2 = unpacked.match(/sl:\s*\{[^}]*m:\s*"([^"]+)"/);
+    var slM2 = unpacked.match(/"sl"\s*:\s*\{[^}]*"m"\s*:\s*"([^"]+)"/);
     if (slM2) slMstr = slM2[1];
 
     var pages = [];
