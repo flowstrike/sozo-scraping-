@@ -60,7 +60,7 @@ function _browseHomepage() {
     var html = r.body || '';
     var results = [];
     var seen = {};
-    var re = /href="\/(\d+bz\/)"[^>]*>[\s\S]*?<img[^>]+src="([^"]+)"[\s\S]*?class="[^"]*title[^"]*"[^>]*>([^<]+)/g;
+    var re = /href="\/(\d+bz\/)"[^>]*>[\s\S]*?<img[^>]*src="([^"]+)"[\s\S]*?<\/a>[\s\S]*?href="\/\1"[^>]*>([^<]+)<\/a>/g;
     var m;
     while ((m = re.exec(html)) !== null) {
       var slug = m[1];
@@ -83,7 +83,7 @@ function _browseHomepage() {
 function _parseSearchResults(html) {
   var results = [];
   var seen = {};
-  var re = /class="mh-item[\s\S]*?href="([^"]+)"[\s\S]*?src="([^"]*)"[\s\S]*?class="title[^"]*"[^>]*href="[^"]*"[^>]*>([\s\S]*?)<\/a>/g;
+  var re = /class="mh-item"[\s\S]*?href="([^"]+)"[\s\S]*?src="([^"]*)"[\s\S]*?class="title"[^>]*>[\s\S]*?<a[^>]*>([\s\S]*?)<\/a>/g;
   var m;
   while ((m = re.exec(html)) !== null) {
     var href = m[1];
