@@ -33,7 +33,8 @@ function _unpackPacked(packedStr) {
   var p = m[1].replace(/\\'/g, "'");
   var a = parseInt(m[2], 10);
   var c = parseInt(m[3], 10);
-  var k = m[4].split('|');
+  var rawK = m[4].replace(/\\'/g, "'");
+  var k = rawK.split('|');
   while (c--) {
     if (k[c]) {
       p = p.replace(new RegExp('\\b' + _baseConv(c, a) + '\\b', 'g'), k[c]);
@@ -187,24 +188,11 @@ function _extractJsVar(html, varName) {
   return m ? m[1] : '';
 }
 
-function _parseCookies(headers) {
-  var sc = headers && (headers['set-cookie'] || headers['Set-Cookie'] || '');
-  if (!sc) return '';
-  var cookies = [];
-  var parts = Array.isArray(sc) ? sc : [sc];
-  for (var i = 0; i < parts.length; i++) {
-    var cv = (parts[i] || '').split(';')[0].trim();
-    if (cv && cv.indexOf('=') > 0) cookies.push(cv);
-  }
-  return cookies.join('; ');
-}
-
 function getPages(chapterUrl) {
   console.log('mangabz pages: ' + chapterUrl);
   return fetch(chapterUrl).then(function(r) {
     if (r.status !== 200) return [];
     var html = r.body || '';
-    var cookieHeader = _parseCookies(r.headers);
 
     var cid = _extractJsVar(html, 'MANGABZ_CID');
     var mid = _extractJsVar(html, 'MANGABZ_MID');
@@ -222,26 +210,45 @@ function getPages(chapterUrl) {
 
     function fetchPage(pageNum) {
       var apiUrl = SITE + '/chapterimage.ashx?cid=' + cid + '&page=' + pageNum + '&key=&_cid=' + cid + '&_mid=' + mid + '&_dt=' + encodeURIComponent(dt) + '&_sign=' + sign;
-      return fetch(apiUrl, { headers: { Cookie: cookieHeader, Referer: chapterUrl } }).then(function(ar) {
+      return fetch(apiUrl, { headers: { Referer: chapterUrl } }).then(function(ar) {
         if (ar.status !== 200) return;
         var body = ar.body || '';
         if (!body) return;
-        try {
-          eval(body);
-        } catch(e) {
-          var unpacked = _unpackPacked(body);
-          try { eval(unpacked); } catch(e2) {}
-        }
-        if (typeof d !== 'undefined' && Array.isArray(d)) {
-          for (var i = 0; i < d.length; i++) {
-            var url = d[i];
-            if (url && !seen[url]) {
-              seen[url] = true;
-              pages.push({ url: url, index: pages.length, headers: { Referer: SITE + '/' } });
+
+        var decoded = _unpackPacked(body);
+        if (!decoded) decoded = body;
+
+        var pixM = decoded.match(/pix\s*=\s*"([^"]+)"/);
+        var pix = pixM ? pixM[1] : '';
+
+        var pvalueM = decoded.match(/pvalue\s*=\s*\[([^\]]+)\]/);
+        if (pix && pvalueM) {
+          var keyM = decoded.match(/key\s*=\s*'([^']+)'/);
+          var cidParam = decoded.match(/\?cid=(\d+)/);
+          var suffixRe = /"([^"]+)"/g;
+          var sm;
+          while ((sm = suffixRe.exec(pvalueM[1])) !== null) {
+            var imgUrl = pix + sm[1];
+            if (keyM && cidParam) {
+              imgUrl += '?cid=' + cidParam[1] + '&key=' + keyM[1] + '&uk=';
+            }
+            if (!seen[imgUrl]) {
+              seen[imgUrl] = true;
+              pages.push({ url: imgUrl, index: pages.length, headers: { Referer: SITE + '/' } });
             }
           }
         }
-        d = undefined;
+
+        if (pages.length === 0) {
+          var urlRe = /https?:\/\/image\.mangabz\.com\/[^'"\s,)}\]]+/g;
+          var um;
+          while ((um = urlRe.exec(decoded)) !== null) {
+            if (!seen[um[0]]) {
+              seen[um[0]] = true;
+              pages.push({ url: um[0], index: pages.length, headers: { Referer: SITE + '/' } });
+            }
+          }
+        }
       }).catch(function() {});
     }
 

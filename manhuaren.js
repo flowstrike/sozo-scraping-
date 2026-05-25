@@ -27,12 +27,14 @@ function _baseConv(n, base) {
 }
 
 function _unpackPacked(packedStr) {
-  var m = packedStr.match(/\('([^']*)',(\d+),(\d+),'([^']*)'/);
+  var re = /\('((?:[^'\\]|\\.)*)',(\d+),(\d+),'((?:[^'\\]|\\.)*)'/;
+  var m = packedStr.match(re);
   if (!m) return '';
-  var p = m[1];
+  var p = m[1].replace(/\\'/g, "'");
   var a = parseInt(m[2], 10);
   var c = parseInt(m[3], 10);
-  var k = m[4].split('|');
+  var rawK = m[4].replace(/\\'/g, "'");
+  var k = rawK.split('|');
   while (c--) {
     if (k[c]) {
       p = p.replace(new RegExp('\\b' + _baseConv(c, a) + '\\b', 'g'), k[c]);
