@@ -30,19 +30,18 @@ function _browseHomepage() {
     var html = r.body || '';
     var results = [];
     var seen = {};
-    var re = /href="\/web\/topic\/(\d+)"[^>]*>([\s\S]*?)<img[^>]+src="(https:\/\/[^"]+)"/g;
+    var re = /href="\/web\/topic\/(\d+)"[\s\S]*?src="(https:\/\/[^"]*kkmh\.com\/image\/[^"]+)"[\s\S]*?class="itemTitle"[^>]*>([\s\S]*?)<\/span>/g;
     var m;
     while ((m = re.exec(html)) !== null) {
       var id = m[1];
       if (seen[id]) continue;
       seen[id] = true;
-      var titleM = m[2].match(/class="itemTitle[^"]*"[^>]*>([\s\S]*?)<\/span>/);
-      var title = titleM ? _clean(titleM[1]) : ('Topic ' + id);
+      var title = _clean(m[3]) || ('Topic ' + id);
       results.push({
         id: id,
         title: title,
         url: SITE + '/web/topic/' + id,
-        cover: m[3],
+        cover: m[2],
         sourceId: SOURCE_ID,
         type: 'manga'
       });

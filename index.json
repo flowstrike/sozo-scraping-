@@ -1,6 +1,6 @@
 {
   "name": "Custom Manga Providers",
-  "description": "Manga providers for Sozo Read: MangaFreak, E-Hentai, 包子漫画, 快看漫画, 漫画人, MangaBZ, 漫画柜.",
+  "description": "Manga providers for Sozo Read: MangaFreak, E-Hentai, 包子漫画, 快看漫画.",
   "sources": [
     {
       "id": "mangafreak",
@@ -40,36 +40,6 @@
       "lang": "zh",
       "file": "kuaikan.js",
       "logo": "https://www.kuaikanmanhua.com/favicon.ico",
-      "nsfw": false
-    },
-    {
-      "id": "manhuaren",
-      "name": "漫画人",
-      "version": "1.0.0",
-      "type": "manga",
-      "lang": "zh",
-      "file": "manhuaren.js",
-      "logo": "https://www.manhuaren.com/favicon.ico",
-      "nsfw": false
-    },
-    {
-      "id": "mangabz",
-      "name": "MangaBZ",
-      "version": "1.0.0",
-      "type": "manga",
-      "lang": "zh",
-      "file": "mangabz.js",
-      "logo": "https://mangabz.com/favicon.ico",
-      "nsfw": false
-    },
-    {
-      "id": "manhuagui",
-      "name": "漫画柜",
-      "version": "1.0.0",
-      "type": "manga",
-      "lang": "zh",
-      "file": "manhuagui.js",
-      "logo": "https://www.manhuagui.com/favicon.ico",
       "nsfw": false
     }
   ]

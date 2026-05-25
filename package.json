@@ -1,0 +1,25 @@
+{
+  "name": "manga",
+  "version": "1.0.0",
+  "description": "Custom source repo for the [Sozo Read](https://github.com/Spyou/Sozo-Read) Flutter app. Each `.js` file is a self-contained scraper for one manga site that the app installs at runtime — no app update required.",
+  "main": "mangaball.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flowstrike/sozo-scraping-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/flowstrike/sozo-scraping-/issues"
+  },
+  "homepage": "https://github.com/flowstrike/sozo-scraping-#readme",
+  "dependencies": {
+    "jsdom": "^29.1.1",
+    "lz-string": "^1.5.0"
+  }
+}

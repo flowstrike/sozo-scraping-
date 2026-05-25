@@ -51,7 +51,7 @@ function loadSource(filePath) {
   return ctx;
 }
 
-var SOURCES = ['baozimh.js', 'kuaikan.js', 'manhuaren.js', 'mangabz.js', 'manhuagui.js'];
+var SOURCES = ['baozimh.js', 'kuaikan.js'];
 var SEARCH_QUERY = '斗破苍穹';
 
 function assert(condition, msg) {
