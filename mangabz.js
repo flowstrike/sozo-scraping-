@@ -138,7 +138,7 @@ function getDetail(url) {
     }
 
     var chapters = [];
-    var chRe = /<a[^>]*class="[^"]*detail-list-form-item[^"]*"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
+    var chRe = /<a[^>]*href="([^"]+)"[^>]*class="[^"]*detail-list-form-item[^"]*"[^>]*>([\s\S]*?)<\/a>/g;
     var cm;
     while ((cm = chRe.exec(html)) !== null) {
       var chHref = cm[1];
