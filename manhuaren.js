@@ -63,7 +63,7 @@ function _browseHomepage() {
 function _parseSearchResults(html) {
   var results = [];
   var seen = {};
-  var re = /class="book-list-cover"[^>]*>[\s\S]*?href="([^"]+)"[\s\S]*?src="([^"]*)"[\s\S]*?class="book-list-info-title[^"]*"[^>]*>([\s\S]*?)<\/h2>/g;
+  var re = /class="book-list-cover"[^>]*>[\s\S]*?href="([^"]+)"[\s\S]*?src="([^"]*)"[\s\S]*?class="book-list-info-title[^"]*"[^>]*>([\s\S]*?)<\/p>/g;
   var m;
   while ((m = re.exec(html)) !== null) {
     var href = m[1];
