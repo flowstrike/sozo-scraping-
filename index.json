@@ -60,7 +60,7 @@
       "lang": "es",
       "file": "apollcomics.js",
       "logo": "https://apollcomics.es/favicon.ico",
-      "nsfw": false
+      "nsfw": true
     },
     {
       "id": "infrafandub",
@@ -70,7 +70,7 @@
       "lang": "es",
       "file": "infrafandub.js",
       "logo": "https://infrafandub.com/favicon.ico",
-      "nsfw": false
+      "nsfw": true
     },
     {
       "id": "mundomanhwa",
@@ -80,7 +80,7 @@
       "lang": "es",
       "file": "mundomanhwa.js",
       "logo": "https://mundomanhwa.com/favicon.ico",
-      "nsfw": false
+      "nsfw": true
     },
     {
       "id": "visormanga",
@@ -90,7 +90,7 @@
       "lang": "es",
       "file": "visormanga.js",
       "logo": "https://visormanga.com/favicon.ico",
-      "nsfw": false
+      "nsfw": true
     }
   ]
 }
