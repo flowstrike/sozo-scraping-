@@ -18,7 +18,10 @@ function htmlTextPolyfill(s) {
 function nodeFetch(url, opts) {
   opts = opts || {};
   var headers = opts.headers || {};
-  return fetch(url, { headers: headers }).then(function(r) {
+  var fetchOpts = { headers: headers };
+  if (opts.method) fetchOpts.method = opts.method;
+  if (opts.body) fetchOpts.body = opts.body;
+  return fetch(url, fetchOpts).then(function(r) {
     return r.text().then(function(body) {
       var allHeaders = {};
       r.headers.forEach(function(v, k) {
@@ -51,9 +54,14 @@ function loadSource(filePath) {
   return ctx;
 }
 
-var SOURCES = ['mangafreak.js', 'baozimh.js', 'kuaikan.js'];
+var SOURCES = ['mangafreak.js', 'herenscan.js', 'apollcomics.js', 'infrafandub.js', 'mundomanhwa.js', 'visormanga.js', 'baozimh.js', 'kuaikan.js'];
 var SEARCH_QUERIES = {
   'mangafreak.js': 'Naruto',
+  'herenscan.js': 'sensible',
+  'apollcomics.js': 'doctor',
+  'infrafandub.js': 'dragon',
+  'mundomanhwa.js': 'sexercise',
+  'visormanga.js': 'jinx',
   'baozimh.js': '斗破苍穹',
   'kuaikan.js': '斗破苍穹'
 };
