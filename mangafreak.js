@@ -90,6 +90,7 @@ function _parseSearchResults(html) {
   while ((m = re.exec(html)) !== null) {
     var slug = m[1];
     var rawTitle = m[2];
+    if (/<[^>]+>/.test(rawTitle)) continue;
     if (seen[slug]) continue;
     seen[slug] = true;
     var title = _clean(rawTitle);
@@ -143,10 +144,13 @@ function getDetail(url) {
     }
 
     var chapters = [];
+    var chSeen = {};
     var chRe = /<a[^>]+href="(\/Read1_[^"]+)">([^<]*)<\/a>/g;
     var cm;
     while ((cm = chRe.exec(html)) !== null) {
       var chLink = cm[1];
+      if (chSeen[chLink]) continue;
+      chSeen[chLink] = true;
       var chTitle = _clean(cm[2]);
       var numMatch = chTitle.match(/(\d+(?:\.\d+)?)/);
       var num = numMatch ? parseFloat(numMatch[1]) : null;

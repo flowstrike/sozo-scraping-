@@ -51,8 +51,12 @@ function loadSource(filePath) {
   return ctx;
 }
 
-var SOURCES = ['baozimh.js', 'kuaikan.js'];
-var SEARCH_QUERY = '斗破苍穹';
+var SOURCES = ['mangafreak.js', 'baozimh.js', 'kuaikan.js'];
+var SEARCH_QUERIES = {
+  'mangafreak.js': 'Naruto',
+  'baozimh.js': '斗破苍穹',
+  'kuaikan.js': '斗破苍穹'
+};
 
 function assert(condition, msg) {
   if (!condition) throw new Error('ASSERT FAIL: ' + msg);
@@ -74,7 +78,7 @@ async function testSource(filePath) {
     try {
       var info = ctx.getInfo();
       assert(info.name, 'getInfo must return name');
-      assert(info.lang === 'zh', 'lang must be zh');
+      assert(info.lang, 'lang must be present');
       assert(info.baseUrl, 'getInfo must return baseUrl');
       assert(info.type === 'manga', 'type must be manga');
       results.tests.push({ test: 'getInfo', pass: true });
@@ -86,7 +90,7 @@ async function testSource(filePath) {
 
     var searchResults = [];
     try {
-      searchResults = await ctx.search(SEARCH_QUERY, 1, {});
+      searchResults = await ctx.search(SEARCH_QUERIES[filePath] || 'Naruto', 1, {});
       assert(Array.isArray(searchResults), 'search must return array');
       if (searchResults.length > 0) {
         var first = searchResults[0];
@@ -155,8 +159,8 @@ async function testSource(filePath) {
 }
 
 async function main() {
-  console.log('=== Chinese Sources Test Runner ===');
-  console.log('Testing ' + SOURCES.length + ' sources with query: "' + SEARCH_QUERY + '"\n');
+  console.log('=== Sources Test Runner ===');
+  console.log('Testing ' + SOURCES.length + ' sources\n');
 
   var allResults = [];
   for (var i = 0; i < SOURCES.length; i++) {
